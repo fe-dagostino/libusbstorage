@@ -1,0 +1,9 @@
+#!/bin/bash
+
+PID=`pgrep -u root usbmond`
+
+if [ -z "${PID}" ]
+then
+ /opt/usbmond/bin/usbmond >> /dev/null 
+fi
+

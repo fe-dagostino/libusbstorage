@@ -1,0 +1,23 @@
+How to Install Recorder deamon
+
+1. log as root
+2. execute ./install.sh
+
+The script will install the program in /opt/usbmond   
+
+/opt/usbmond
+|
+|- bin 
+|- cfg
+
+"bin" subdir will contains usbmond and usbmond.cron
+-usbmond     : is the deamon compiled in release mode
+-usbmond.cron: used to create a cron job, this script will check for the process usbmond and if not running it will be executed.
+
+"cfg" subir will contains usbmond.cfg 
+-usbmond.cfg  : configuration file for recording deamon
+
+The install.sh script also create a sub folder in  /etc/ named 'usbmond' and in that subfolder just a simbolic link to -> usbmond.cfg
+The install.sh script also create a sub folder in /var/log/ named 'usbmond'. This is the default log path for usbmond.
+
+In order to have access to devices and so to have mount CAPS 'on' this deamon will run as root. 
