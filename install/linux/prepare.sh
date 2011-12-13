@@ -13,6 +13,9 @@ USER=root
 PRGR=usbmond
 CONF=usbmond.cfg
 
+mkdir cfg
+mkdir bin
+
 cp ../../config/$CONF ./cfg/
 cp ../../build/$PRGR  ./bin/
 
