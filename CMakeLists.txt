@@ -5,6 +5,32 @@ include_directories( ./include/ )
 include_directories( ../FEDLibrary/source/include )
 include_directories( ../FEDLibrary/source/template_include )
 
+IF(NOT CMAKE_BUILD_TYPE )
+  SET(CMAKE_BUILD_TYPE Release CACHE STRING
+    "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel."
+    FORCE)
+ENDIF()
+
+IF( CMAKE_BUILD_TYPE STREQUAL "Debug" )
+  set(  USBMOND_VERSION
+	-1.0.0-debug
+    )
+  set(  USBSTORAGE_VERSION
+	-1.0.0-debug
+    )
+  set(  FEDLIB_VER
+        -3.0.0-debug
+     )
+ELSE()
+  set(  USBMOND_VERSION
+    )
+  set(  USBSTORAGE_VERSION
+	-1.0.0
+    )
+  set(  FEDLIB_VER
+        -3.0.0
+     )
+ENDIF()
 
 set(  USBMOND_INCLUDE
         ./include/COMMANDS/UsbMondList.h
@@ -51,19 +77,25 @@ set(  LIBUSBSTORAGE_SRC
 )
 
 set(  LIBUSBMOND_LIBRARIES
-      fedlibrary-3.0.0
+      fedlibrary${FEDLIB_VER}
       pthread
       udev
 )
 
 set(  LIBUSBSTORAGE_LIBRARIES
-      fedlibrary
+      fedlibrary${FEDLIB_VER}
       pthread
       udev
 )
 
+
+IF( CMAKE_BUILD_TYPE STREQUAL "Debug" )
 add_definitions(
-#                -ggdb3
+                -ggdb3
+)
+ENDIF()
+
+add_definitions(
                 -D__STDC_CONSTANT_MACROS
                 -D_NO_FED_NAMESPACE
                 -D_TRACING_EXCEPTION_RAISE
@@ -76,18 +108,18 @@ add_definitions(
                 -D_ENABLE_ASSERTION_TRACING
                )
 
-add_library   ( usbstorage  SHARED ${LIBUSBSTORAGE_SRC} )
+add_library   ( usbstorage${USBSTORAGE_VERSION}  SHARED ${LIBUSBSTORAGE_SRC} )
 
-add_executable( udevtest     udevtest.cpp)
-add_executable( usbmond      ${USBMOND_SRC} )
+add_executable( udevtest                                  udevtest.cpp)
+add_executable( usbmond${USBMOND_VERSION}                 ${USBMOND_SRC} )
 
-add_executable( usbdiskmon   ${LIBUSBSTORAGE_SRC} main.cpp )
+add_executable( usbdiskmon                                ${LIBUSBSTORAGE_SRC} main.cpp )
 
-target_link_libraries( usbstorage       ${LIBUSBSTORAGE_LIBRARIES} )
+target_link_libraries( usbstorage${USBSTORAGE_VERSION}    ${LIBUSBSTORAGE_LIBRARIES} )
 
-target_link_libraries( udevtest         ${LIBUSBSTORAGE_LIBRARIES} )
-target_link_libraries( usbmond          ${LIBUSBMOND_LIBRARIES}    )
-target_link_libraries( usbdiskmon       ${LIBUSBSTORAGE_LIBRARIES} )
+target_link_libraries( udevtest                    ${LIBUSBSTORAGE_LIBRARIES} )
+target_link_libraries( usbmond${USBMOND_VERSION}   ${LIBUSBMOND_LIBRARIES}    )
+target_link_libraries( usbdiskmon                  ${LIBUSBSTORAGE_LIBRARIES} )
 
-install( TARGETS usbstorage  LIBRARY DESTINATION /usr/local/lib )
+install( TARGETS usbstorage${USBSTORAGE_VERSION}  LIBRARY DESTINATION /usr/local/lib )
 install( FILES   ${LIBUSBSTORAGE_INCLUDE} DESTINATION /usr/include/libusbstorage )
