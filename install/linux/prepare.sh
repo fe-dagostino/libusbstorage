@@ -19,5 +19,5 @@ mkdir lib
 
 cp ../../config/$CONF ./cfg/
 cp ../../build/$PRGR  ./bin/
-cp /usr/local/lib/fedlibrary-3.0.0.so  ./lib/
+cp /usr/local/lib/libfedlibrary-3.0.0.so  ./lib/
 
