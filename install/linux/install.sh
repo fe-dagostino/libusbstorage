@@ -36,6 +36,10 @@ mkdir /opt/$PRGR/cfg
 echo "Copy deamon ..."
 cp ./bin/$PRGR   /opt/$PRGR/bin/
 
+echo "Copy deamon ..."
+cp ./lib/*   /usr/local/lib/
+ldconfig
+
 echo "Copy cron check version ..."
 cp ./$CRON /opt/$PRGR/bin/
 

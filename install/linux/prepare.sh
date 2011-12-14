@@ -15,7 +15,9 @@ CONF=usbmond.cfg
 
 mkdir cfg
 mkdir bin
+mkdir lib
 
 cp ../../config/$CONF ./cfg/
 cp ../../build/$PRGR  ./bin/
+cp /usr/local/lib/fedlibrary-3.0.0.so  ./lib/
 
