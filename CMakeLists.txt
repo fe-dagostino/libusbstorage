@@ -51,7 +51,7 @@ set(  LIBUSBSTORAGE_SRC
 )
 
 set(  LIBUSBMOND_LIBRARIES
-      fedlibrary
+      fedlibrary-3.0.0
       pthread
       udev
 )
