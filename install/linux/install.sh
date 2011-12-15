@@ -14,16 +14,6 @@ PRGR=usbmond
 CONF=usbmond.cfg
 CRON=check.cron
 
-echo "Check if user $USER exists"
-/bin/id $USER 2>/dev/null
-if [ $? -eq 0 ]
-then
-	echo "User $USER found"
-else
-	echo "User $USER not found"
-	exit -2
-fi
-
 #
 # Deamon installation
 #
