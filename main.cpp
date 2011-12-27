@@ -1,6 +1,7 @@
 
-
+#include "FStopWatch.h"
 #include "./include/UsbStorageMonitor.h"
+
 
 class UsbEvents : public UsbStorageMonitorEvents
 {
@@ -27,21 +28,37 @@ class UsbEvents : public UsbStorageMonitorEvents
 	    event.devnode, event.subsystem, event.devtype, event.mountpoint, event.action, event.disksize, event.availablesize ); 
   }
   
+  void OnDevicePartitionReleasedEvent( const UsbMondNotifyPartitionReleased& event )
+  {
+    printf( "MountPoint[%s], Released[%d]\n", 
+	    event.mountpoint, event.released ); 
+  }
 };
 
 int main (void)
 {
   UsbStorageMonitor _monUsbStorage;
+  FStopWatch        _swReqRelease;
 
   _monUsbStorage.Start( 
 			"127.0.0.1",
 			50000,
 			new UsbEvents() );
   
+  _swReqRelease.Reset();
+  
   while ( true )
   {
      printf( "Running .. \n" );
      FThread::Sleep( 10000 );
+     
+     if ( _swReqRelease.Peek() > 60 )
+     {
+       printf( "Request Partition Release for [/mnt/usbkey1] .. \n" );
+       _monUsbStorage.RequestPartitionRelease( "/mnt/usbkey1" );
+       
+       _swReqRelease.Reset();
+     }
   }
 
   return 0;       
