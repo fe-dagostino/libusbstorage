@@ -22,6 +22,7 @@
 #define USBSTORAGEMONITOR_H
 
 #include "FThread.h"
+#include "FSocket.h"
 #include "UsbStorageMonitorEvents.h"
 
 #include <libudev.h>
@@ -40,6 +41,12 @@ public:
   ~UsbStorageMonitor();
 
   /**
+   * Connect StorageMonitor instance to the specified server.
+   * @param sDestAddress   server destination address
+   * @param wDestPort      server destination port
+   * @param pEvents        events implemetation that will be raised from 
+   *                       monitor instance.
+   * Return value will be true in case of success, false otherwise.
    */
   bool 	Start(
 	      const FString&           sDestAddress,
@@ -47,17 +54,47 @@ public:
 	      UsbStorageMonitorEvents* pEvents 
 	      );
   /**
+   * Stop monitoring.
+   * Do not release the connection with the server but just suspend raising
+   * at the appliation level.
+   * Return true if the function succeded, false otherwise.
    */
   bool 	Stop();
   
+  /**
+   * Used to unmount the partition. 
+   * Unmounting force flush of all disk buffers so it will avoid corrupted
+   * data stored on usb support.
+   * An event will be dispatched to all connected clients in order to update
+   * them that the resources will be no available.
+   * Return true if the function succeded, false otherwise.
+   */
+  bool 	RequestPartitionRelease( const FString& sMountPoint );
+  
+  
 private:
   /**
-    */
-  virtual VOID		Run();
+   */
+  VOID     Run();
 
-private:  
-  volatile bool             m_bExit;
-  volatile bool             m_bRaiseEvents;
+  /**
+   * Connect to the remote server or do nothing if the connection is alredy active.
+   * Return true if the function succeded, false otherwise.
+   */
+  bool     Connect();
+  /**
+   */
+  bool     Send( const UsbMondHeader* pPacket );
+  /**
+   */
+  bool     WaitAnswer( UsbMondHeader* pAnswer, int len, long waitingtime );
+
+private:
+  FMutex                    m_mtxMonitor;
+  FSocket*                  m_pSocket;
+
+  bool                      m_bExit;
+  bool                      m_bRaiseEvents;
   FString                   m_sDestAddress;
   WORD                      m_wDestPort;
   UsbStorageMonitorEvents*  m_pUsbStorageMonitorEvents;

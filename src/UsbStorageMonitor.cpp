@@ -19,7 +19,7 @@
 
 
 #include "UsbStorageMonitor.h"
-#include <FSocket.h>
+#include "FMutexCtrl.h"
 
 USING_NAMESPACE_FED
 
@@ -27,6 +27,7 @@ GENERATE_CLASSINFO( UsbStorageMonitor, FThread )
 
 UsbStorageMonitor::UsbStorageMonitor()
  : FThread( NULL, TP_ABOVE_NORMAL, 10240 ),
+   m_pSocket( NULL ),
    m_bExit( false ),
    m_bRaiseEvents( false ),
    m_pUsbStorageMonitorEvents( NULL )
@@ -37,6 +38,12 @@ UsbStorageMonitor::~UsbStorageMonitor()
 {
     m_bExit = true;
     FThread::Stop();
+    
+    if ( m_pSocket != NULL )
+    {
+      delete m_pSocket;
+      m_pSocket = NULL;
+    }
 }
 
 bool 	UsbStorageMonitor::Start( 
@@ -45,6 +52,8 @@ bool 	UsbStorageMonitor::Start(
 				  UsbStorageMonitorEvents* pEvents 
 				)
 {
+  FMutexCtrl _mtxCtrl( m_mtxMonitor );
+  
   if ( pEvents == NULL )
     return false;
 
@@ -63,81 +72,88 @@ bool 	UsbStorageMonitor::Start(
 
 bool 	UsbStorageMonitor::Stop()
 {
+  FMutexCtrl _mtxCtrl( m_mtxMonitor );
+  
   m_bRaiseEvents = false;
+  return true;
+}
+
+bool 	UsbStorageMonitor::RequestPartitionRelease( const FString& sMountPoint )
+{
+  FMutexCtrl _mtxCtrl( m_mtxMonitor );
+  
+  if ( sMountPoint.IsEmpty() )
+    return false;
+  
+  if ( Connect() == false )
+    return false;
+  
+  UsbMondRequestPartitionRelease        _reqPartRel( (const char*)sMountPoint );
+  if ( Send( &_reqPartRel ) == false )
+    return false;
+  
   return true;
 }
 
 VOID	UsbStorageMonitor::Run()
 {
-  FSocket          *pSocket = NULL;
   
   while ( !m_bExit )
   {
-    if ( pSocket == NULL )
+
+    if ( Connect() == false )
     {
       // Just avoid loop
       FThread::Sleep( 500 );
-      FTRY
-      {
-	/**
-	* Create the socket instance
-	*/
-	pSocket = new FSocket( AF_INET, SOCK_STREAM, 0 );
-	if (!pSocket) 
-	{
-	  if ( m_bRaiseEvents )
-	    m_pUsbStorageMonitorEvents->OnErrorOccurs();  
-	  
-	  continue;
-	}
-    
-	pSocket->Connect( m_sDestAddress, m_wDestPort ); 
-      }
-      FCATCH( FSocketException, ex )
-      {
-	delete pSocket;
-	pSocket = NULL;
-      }
-      
-      if (!pSocket) 
-      {
-	if ( m_bRaiseEvents )
-	  m_pUsbStorageMonitorEvents->OnErrorOccurs();  
-	
-	continue;
-      }
-    } // if ( udev == NULL )
-    
+
+      continue;
+    }
+
+    m_mtxMonitor.EnterMutex();
 
     struct   timeval timeout  = { 1/*tv.tv_sec*/, 0/*tv.tv_usec*/ }; 
     
-    WORD _wResult = 0;
+    WORD     _wResult = 0;
     FTRY
     {
-      _wResult = pSocket->Select( FSocket::READY_FOR_READ|FSocket::EXCEPTION_OCCUR|FSocket::TIME_OUT_OCCUR, &timeout );
+      _wResult = m_pSocket->Select( FSocket::READY_FOR_READ|FSocket::EXCEPTION_OCCUR|FSocket::TIME_OUT_OCCUR, &timeout );
     }
     FCATCH( FSocketException, ex )
     {
-      delete pSocket;
-      pSocket = NULL;
+      delete m_pSocket;
+      m_pSocket = NULL;
     }
 
-    if (!pSocket) 
+    if (!m_pSocket) 
     {
       if ( m_bRaiseEvents )
 	m_pUsbStorageMonitorEvents->OnErrorOccurs();  
       
+      // Release mutex 
+      m_mtxMonitor.LeaveMutex();
+      // Favorite context switch
+      FThread::YieldThread();
       continue;
     }
 
     if ( _wResult & FSocket::TIME_OUT_OCCUR )
+    {
+      // Release mutex 
+      m_mtxMonitor.LeaveMutex();
+      // Favorite context switch
+      FThread::YieldThread();
       continue;
-
+    }
+    
     if ( _wResult & FSocket::EXCEPTION_OCCUR )
     {
-      delete pSocket;
-      pSocket = NULL;
-      
+      delete m_pSocket;
+      m_pSocket = NULL;
+
+      // Release mutex 
+      m_mtxMonitor.LeaveMutex();
+      // Favorite context switch
+      FThread::YieldThread();
       continue;
     }
 
@@ -145,18 +161,27 @@ VOID	UsbStorageMonitor::Run()
     {
       FTRY
       {
+	// When ready for read and no data are present this a condition  for 
+	// broken connection.
 	// If enqueued data are less than proto header most likely incoming
 	// is corrupted
-	if ( pSocket->Peek() < sizeof(UsbMondHeader) )
+	if (
+	    ( m_pSocket->Peek() == 0                    ) || 
+	    ( m_pSocket->Peek() < sizeof(UsbMondHeader) )
+	   )
 	{
-	  delete pSocket;
-	  pSocket = NULL;
+	  delete m_pSocket;
+	  m_pSocket = NULL;
 	  
+	  // Release mutex 
+	  m_mtxMonitor.LeaveMutex();
+	  // Favorite context switch
+	  FThread::YieldThread();	  
 	  continue;
 	}
 	
 	UsbMondHeader  _header;
-	pSocket->Peek( &_header, sizeof(_header) );
+	m_pSocket->Peek( &_header, sizeof(_header) );
 	
 	// Incoming frame is corrupted
 	if ( _header.version != 1 )
@@ -174,7 +199,7 @@ VOID	UsbStorageMonitor::Run()
 	    UsbMondNotifyUsbDevice   _event;
 	    int                      _evlen = sizeof(_event);
 	    
-	    pSocket->Receive( &_event, _evlen );
+	    m_pSocket->Receive( &_event, _evlen );
 	    
 	    if ( m_bRaiseEvents )
 	    {
@@ -187,7 +212,7 @@ VOID	UsbStorageMonitor::Run()
 	    UsbMondNotifyDisk   _event;
 	    int                 _evlen = sizeof(_event);
 	    
-	    pSocket->Receive( &_event, _evlen );
+	    m_pSocket->Receive( &_event, _evlen );
 	    
 	    if ( m_bRaiseEvents )
 	    {
@@ -200,11 +225,24 @@ VOID	UsbStorageMonitor::Run()
 	    UsbMondNotifyPartition   _event;
 	    int                      _evlen = sizeof(_event);
 	    
-	    pSocket->Receive( &_event, _evlen );
+	    m_pSocket->Receive( &_event, _evlen );
 	    
 	    if ( m_bRaiseEvents )
 	    {
 	      m_pUsbStorageMonitorEvents->OnDevicePartitionEvent( _event );
+	    }
+	  }; break;
+
+	  case eMsgNotifyPartitionReleasedEvent:
+	  {
+	    UsbMondNotifyPartitionReleased  _event;
+	    int                             _evlen = sizeof(_event);
+	    
+	    m_pSocket->Receive( &_event, _evlen );
+	    
+	    if ( m_bRaiseEvents )
+	    {
+	      m_pUsbStorageMonitorEvents->OnDevicePartitionReleasedEvent( _event );
 	    }
 	  }; break;
 	  
@@ -215,9 +253,137 @@ VOID	UsbStorageMonitor::Run()
       }
       FCATCH( FSocketException, ex )
       {
-	delete pSocket;
-	pSocket = NULL;
+	delete m_pSocket;
+	m_pSocket = NULL;
       }
     }
+    
+    // Release mutex 
+    m_mtxMonitor.LeaveMutex();
+    // Favorite context switch
+    FThread::YieldThread();
   }// while ( !m_bExit )
+}
+
+
+bool UsbStorageMonitor::Connect()
+{
+  bool       _bRetVal = true;
+  FMutexCtrl _mtxCtrl( m_mtxMonitor );
+  
+  if ( m_pSocket != NULL )
+    return _bRetVal;
+  
+  FTRY
+  {
+    /**
+    * Create the socket instance
+    */
+    m_pSocket = new FSocket( AF_INET, SOCK_STREAM, 0 );
+    if ( m_pSocket == NULL ) 
+    {
+      if ( m_bRaiseEvents )
+	m_pUsbStorageMonitorEvents->OnErrorOccurs();  
+      
+      _bRetVal = false;
+    }
+    else
+    {
+      m_pSocket->Connect( m_sDestAddress, m_wDestPort );
+    }
+  }
+  FCATCH( FSocketException, ex )
+  {
+    delete m_pSocket;
+    m_pSocket = NULL;
+    
+    _bRetVal = false;
+  }
+
+  if ( m_pSocket == NULL ) 
+  {
+    if ( m_bRaiseEvents )
+      m_pUsbStorageMonitorEvents->OnErrorOccurs();  
+  }
+  
+  return _bRetVal;
+}
+
+bool UsbStorageMonitor::Send( const UsbMondHeader* pPacket )
+{
+  if ( pPacket == NULL )
+    return false;
+
+  bool       _bRetVal = true;
+  FMutexCtrl _mtxCtrl( m_mtxMonitor );
+
+  FTRY
+  {
+    m_pSocket->Send( pPacket, pPacket->size );
+  }
+  FCATCH( FSocketException, ex )
+  {
+    delete m_pSocket;
+    m_pSocket = NULL;
+    
+    _bRetVal = false;
+  }
+  
+  return _bRetVal;
+}
+
+bool UsbStorageMonitor::WaitAnswer( UsbMondHeader* pAnswer, int len, long waitingtime )
+{
+  bool       _bRetVal = false;
+  FMutexCtrl _mtxCtrl( m_mtxMonitor );
+
+  struct   timeval timeout  = { waitingtime, 0/*tv.tv_usec*/ }; 
+    
+  WORD     _wResult = 0;
+  FTRY
+  {
+    _wResult = m_pSocket->Select( FSocket::READY_FOR_READ|FSocket::EXCEPTION_OCCUR|FSocket::TIME_OUT_OCCUR, &timeout );
+  }
+  FCATCH( FSocketException, ex )
+  {
+    delete m_pSocket;
+    m_pSocket = NULL;
+  }
+
+  if ( _wResult & FSocket::READY_FOR_READ )
+  {
+    FTRY
+    {
+      // Broken connection condition
+      if ( m_pSocket->Peek() == 0 )
+      {
+      }
+      // Corrupted packet condition
+      else if ( m_pSocket->Peek() < sizeof(UsbMondHeader) )
+      {
+      }
+      else
+      {
+	m_pSocket->Receive( pAnswer, len );
+	_bRetVal = true;
+      }
+    }
+    FCATCH( FSocketException, ex )
+    {
+      delete m_pSocket;
+      m_pSocket = NULL;
+    }
+  }
+  
+  if ( _wResult & FSocket::EXCEPTION_OCCUR )
+  {
+    delete m_pSocket;
+    m_pSocket = NULL;
+  }
+  
+  if ( _wResult & FSocket::TIME_OUT_OCCUR )
+  {
+  }
+  
+  return _bRetVal;
 }
