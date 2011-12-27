@@ -24,6 +24,7 @@
 #include "UsbMondProto.h"
 
 /**
+ * Events interface.
  */
 class UsbStorageMonitorEvents
 {
@@ -33,17 +34,25 @@ public:
     UsbStorageMonitorEvents();
 
     /**
+     * Raised in presence of errors.
      */
     virtual void OnErrorOccurs() = 0;
     /**
+     * Raised when an usb device will be connected/disconnected
      */
     virtual void OnDeviceUsbDeviceEvent( const UsbMondNotifyUsbDevice& event ) = 0;
     /**
      */
     virtual void OnDeviceDiskEvent     ( const UsbMondNotifyDisk&      event ) = 0;
     /**
+     * Raised when a partition type will be detected.
      */
     virtual void OnDevicePartitionEvent( const UsbMondNotifyPartition& event ) = 0;
+    /**
+     * Raised in order to notify that a partion has been released.
+     */
+    virtual void OnDevicePartitionReleasedEvent( const UsbMondNotifyPartitionReleased& event ) = 0;
+    
 };
 
 #endif // USBSTORAGEMONITOREVENTS_H
