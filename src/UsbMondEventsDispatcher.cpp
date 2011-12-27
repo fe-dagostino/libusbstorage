@@ -20,10 +20,14 @@
 
 #include "UsbMondEventsDispatcher.h"
 
+#include "FMutexCtrl.h"
 #include "FChannel.h"
 #include "FChannelFactory.h"
 #include "UsbMondConfig.h"
 
+#include "LOGGING/FLogger.h"
+
+#include <sys/mount.h>
 
 NAMESPACE_FED_BEGIN
 NAMESPACE_LOGGING_BEGIN
@@ -32,27 +36,105 @@ NAMESPACE_LOGGING_BEGIN
 /**
  *
  */
-class UsbMondEventsDispatcher::UsbMondChannel : public FChannel
+class UsbMondEventsDispatcher::UsbMondChannel : protected FChannel, virtual protected IChannelReaderEvents
 {
 public:
-	/***/
-	UsbMondChannel( IConnection* pIConnection )
-		: FChannel( pIConnection )
-	{
-	}
+  /***/
+  UsbMondChannel( IConnection* pIConnection )
+    : FChannel( pIConnection )
+  {
+  }
 
-	/***/
-	virtual ~UsbMondChannel()
-	{
-	}
+  /***/
+  virtual ~UsbMondChannel()
+  {
+  }
+
+  BOOL Write( const UsbMondHeader& rMsg )
+  {
+    BOOL bRetVal = FALSE;
+    FTRY
+    {
+      bRetVal = GetConnection()->Write( FData(	
+				      &rMsg, 
+				      (DWORD)rMsg.size
+				    ) 
+			    );
+    }
+    FCATCH( FChannelException, ex ) 
+    {
+      //@todo
+    }
+    
+    return bRetVal;
+  }
+  
+// IChannelReaderEvents implementation
+protected:
+  /***/
+  VOID	OnReaderStarted()
+  {
+  }
+
+  /***/
+  VOID	OnDataReceived( const VOID* pData, DWORD dwDataLen )
+  {
+    if ( dwDataLen < sizeof(UsbMondHeader) )
+    {
+      //@todo
+      return;
+    }
+    
+    const UsbMondHeader* pUsbMondHeader = (const UsbMondHeader*)pData;
+    
+    switch ( pUsbMondHeader->type )
+    {
+      case eMsgRequestPartitionRelease:
+      {
+	const UsbMondRequestPartitionRelease* pReqPartRel = (const UsbMondRequestPartitionRelease*)pData;
+	
+	int _iRetVal = umount( pReqPartRel->mountpoint );
+	
+	UsbMondNotifyPartitionReleased        notifyParRel( pReqPartRel->mountpoint, (_iRetVal==0));
+	
+	// Dispatch event to all connected clients.
+	UsbMondEventsDispatcher::GetInstance().Dispatch( notifyParRel );
+	
+      }; break;
+      default:
+      {
+      }; break;
+    }
+  }
+
+  /**
+  * By default, in presence of errors, return value is TRUE and 
+  * instruct the channel to finalize the connection and to release 
+  * memory resources.
+  */
+  BOOL	OnReaderError( ChannelError eError )
+  { 
+    return TRUE;
+  };
+
+  /***/
+  VOID	OnReadTimeOut()
+  {
+  }
+
+  /***/
+  VOID	OnStopReader()
+  {
+  }
 
 /* FChannelimplementation */
 protected:
-	/***/
-	IChannelReaderEvents*   GetReaderEvents() { return NULL; };
-	/***/
-	IChannelWriterEvents*   GetWriterEvents() { return NULL; };
+  /***/
+  IChannelReaderEvents*   GetReaderEvents() { return this; };
+  /***/
+  IChannelWriterEvents*   GetWriterEvents() { return NULL; };
 
+  friend class UsbMondEventsDispatcher::UsbMondChannelFactory;
 };
 
 class UsbMondEventsDispatcher::UsbMondChannelFactory : public FChannelFactory
@@ -69,7 +151,15 @@ public:
 protected:
 	FChannel*		CreateChannel( IConnection* pIConnection ) const
 	{
-		return new UsbMondChannel( pIConnection );
+		UsbMondChannel* pUsbMondChannel = new UsbMondChannel( pIConnection );
+		
+		if ( pUsbMondChannel != NULL )
+		{
+		  LOG_INFO( "Start Reader on a new Channel", CreateChannel() )
+		  pUsbMondChannel->StartReader( pUsbMondChannel );
+		}
+		
+		return pUsbMondChannel;
 	}
 
 };
@@ -102,22 +192,18 @@ VOID   UsbMondEventsDispatcher::OnFinalize()
   
 BOOL    UsbMondEventsDispatcher::Dispatch( const UsbMondHeader& rMsg )
 {
+  FMutexCtrl _mtxCtrl( m_mtxDispatch );
+
+  LOG_INFO( FString( 0, "Dispatching Message [%d] Len [%d]", rMsg.type, rMsg.size ), Dispatch() )
+
   FChannelCollector::Iterator _iter            = m_server.GetChannelCollector().Begin();
   UsbMondChannel*             _pUsbMondChannel = NULL;
 
   while ( (_pUsbMondChannel = (UsbMondChannel*)_iter.GetChannel()) )
   {
-    FTRY
+    if ( _pUsbMondChannel->Write( rMsg ) == FALSE )
     {
-      _pUsbMondChannel->GetConnection()->Write( FData(	
-                                                        &rMsg, 
-                                                        (DWORD)rMsg.size
-                                                     ) 
-                                               );
-    }
-    FCATCH( FChannelException, ex ) 
-    {
-
+      //@todo
     }
   }
 
