@@ -28,7 +28,7 @@
 #include "UsbMondProto.h"
 
 /**
- *
+ * Event dispatcher singleton class.
  */
 class UsbMondEventsDispatcher : public FSingleton
 {
@@ -44,7 +44,9 @@ protected:
 
 public:  
   
-  /***/
+  /**
+   * Dispatch message to all connected channels.
+   */
   BOOL         Dispatch( const UsbMondHeader& rMsg );
   
 private:
@@ -55,7 +57,7 @@ public:
 
   
 private:
-    
+  FMutex      m_mtxDispatch;  
   FServer     m_server;
     
 };
