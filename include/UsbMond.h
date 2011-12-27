@@ -27,7 +27,7 @@
 USING_NAMESPACE_FED
 
 /**
- *
+ * Usb Monitor Deamon.
  */
 class UsbMond : public FService
 {
@@ -39,9 +39,13 @@ public:
   /***/
   virtual ~UsbMond();
 
-  /***/
+  /**
+   * Return Log Message Flags as for configuration file.
+   */
   DWORD        GetLogMessageFlags() const;
-  /***/
+  /**
+   * Return Verbosity Log Flags as for configuration file.
+   */
   DWORD        GetVerbosityLevelFlags() const;
   
 private:  
