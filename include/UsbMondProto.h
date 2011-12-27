@@ -31,7 +31,12 @@ enum eUsbMessages
   eMsgNotifyDiskEvent,
   eMsgNotifyDiskEventAnswer,
   eMsgNotifyPartitionEvent,
-  eMsgNotifyPartitionEventAnswer
+  eMsgNotifyPartitionEventAnswer,
+  eMsgNotifyPartitionReleasedEvent,
+  eMsgNotifyPartitionReleasedEventAnswer,
+  
+  eMsgRequestPartitionRelease       = 100,
+  eMsgRequestPartitionReleaseAnswer
 };
 
 struct UsbMondHeader
@@ -110,6 +115,23 @@ struct UsbMondNotifyPartition : public UsbMondHeader
   char		mountpoint[DEV_PROPS_MAX_LEN];
   double        disksize;                        // Expressed in GB
   double        availablesize;                   // Expressed in GB
+};
+
+
+struct UsbMondNotifyPartitionReleased : public UsbMondHeader
+{
+  UsbMondNotifyPartitionReleased();
+  UsbMondNotifyPartitionReleased( const char* mountpoint, bool released );
+  
+  char		mountpoint[DEV_PROPS_MAX_LEN];
+  bool		released;
+};
+
+struct UsbMondRequestPartitionRelease : public UsbMondHeader
+{
+  UsbMondRequestPartitionRelease( const char* mountpoint );
+  
+  char		mountpoint[DEV_PROPS_MAX_LEN];
 };
 
 eUsbAction strtoaction( const char* );

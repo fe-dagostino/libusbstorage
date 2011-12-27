@@ -122,6 +122,34 @@ UsbMondNotifyPartition::UsbMondNotifyPartition(
 }
 
 
+UsbMondNotifyPartitionReleased::UsbMondNotifyPartitionReleased()
+  : UsbMondHeader( 1, eMsgNotifyPartitionReleasedEvent, 0, sizeof(UsbMondNotifyPartitionReleased) )
+{
+  memset( this->mountpoint, '\0', sizeof(this->mountpoint) );
+
+  this->released = false;
+};
+
+UsbMondNotifyPartitionReleased::UsbMondNotifyPartitionReleased( const char* mountpoint, bool released )
+  : UsbMondHeader( 1, eMsgNotifyPartitionReleasedEvent, 0, sizeof(UsbMondNotifyPartitionReleased) )
+{
+  memset( this->mountpoint, '\0', sizeof(this->mountpoint) );
+
+  strncpy( this->mountpoint, mountpoint, sizeof(this->mountpoint) );
+  
+  this->released = released;
+};
+  
+
+
+UsbMondRequestPartitionRelease::UsbMondRequestPartitionRelease( const char* mountpoint )
+  : UsbMondHeader( 1, eMsgRequestPartitionRelease, 0, sizeof(UsbMondRequestPartitionRelease) )
+{
+  memset( this->mountpoint, '\0', sizeof(this->mountpoint) );
+
+  strncpy( this->mountpoint, mountpoint, sizeof(this->mountpoint) );
+}
+
 
 eUsbAction strtoaction( const char* pAction )
 {
