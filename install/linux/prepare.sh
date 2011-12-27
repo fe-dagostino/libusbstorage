@@ -11,13 +11,15 @@ fi
 
 USER=root
 PRGR=usbmond
+PRGR1=usbdiskmon
 CONF=usbmond.cfg
 
 mkdir cfg
 mkdir bin
 mkdir lib
 
-cp ../../config/$CONF ./cfg/
-cp ../../build/$PRGR  ./bin/
+cp ../../config/$CONF                     ./cfg/
+cp ../../build-release/$PRGR              ./bin/
+cp ../../build-release/$PRGR1             ./bin/
 cp /usr/local/lib/libfedlibrary-3.0.0.so  ./lib/
 
