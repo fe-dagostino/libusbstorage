@@ -27,11 +27,19 @@ USING_NAMESPACE_FED
 USING_NAMESPACE_RCI
 
 /**
+ * Extension for IRciCommand.
  */
 class IUsbMondCommand : public IRciCommand
 {
 public:
-  /***/
+  /**
+   * Constructor.
+   * @param sCommandName          command to be registered on command collector.
+   *                              CommandName should be unique.
+   * @param dwRequiredArguments   number of arguments required by command. This
+   *                              value will be used by command parser for checking
+   *                              input parametes.
+   */
   IUsbMondCommand( const FString& sCommandName, DWORD dwRequiredArguments )
     : IRciCommand( sCommandName, dwRequiredArguments )
   {}
@@ -40,13 +48,19 @@ public:
   virtual ~IUsbMondCommand()
   {}
 
-  /***/
+  /**
+   * To be implemented in order to return command description.
+   */
   virtual FString	Description() const = 0;
 
-  /***/
+  /**
+   * To be implemented in order to return command usage information.
+   */
   virtual FString	Help() const = 0;
 
-  /***/
+  /**
+   * To be implemented in order to perform command operation.
+   */
   virtual RciResponse	Execute( FChannel& rChannel, const FArguments& rArgs, FArguments& rResults ) const = 0;
 
 };
