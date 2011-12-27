@@ -72,7 +72,9 @@ public:
    * in configuration.
    */
   const FParameter*  GetSupportedFileSystems( BOOL * pbStored ) const;
-  
+  /**
+   * Return options for the specified file system.
+   */
   FString            GetFileSystemOptions( const FString& sfs, BOOL * pbStored ) const;
   
   /////////////////////////////
@@ -80,9 +82,11 @@ public:
   ///////////////////////
 
   /**
+   * Return binding interface for Monitor.
    */
   FString	GetMonitorServerAddress( BOOL* pbStored ) const;
   /**
+   * Return binding port for Monitor.
    */
   WORD		GetMonitorServerPort   ( BOOL* pbStored ) const;
 
