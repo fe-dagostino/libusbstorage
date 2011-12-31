@@ -22,6 +22,7 @@
 
 #include "FMutexCtrl.h"
 #include "FChannel.h"
+#include "IThreadFactory.h"
 #include "FChannelFactory.h"
 #include "UsbMondConfig.h"
 
@@ -40,8 +41,8 @@ class UsbMondEventsDispatcher::UsbMondChannel : protected FChannel, virtual prot
 {
 public:
   /***/
-  UsbMondChannel( IConnection* pIConnection )
-    : FChannel( pIConnection )
+  UsbMondChannel( IConnection* pIConnection, IThreadFactory* pThreadFactory )
+    : FChannel( pIConnection, pThreadFactory )
   {
   }
 
@@ -137,6 +138,19 @@ protected:
   friend class UsbMondEventsDispatcher::UsbMondChannelFactory;
 };
 
+// Threads coming from RCI runs in concurrency with main thread that is set 
+// to with TP_CRITICAL priority. Creating RCI thread with the same priority
+// will force the scheduler to provide the same cpu time occupation avoiding
+// RCI threads from waiting long time before to be served.
+class UsbMondEventsDispatcher::UsbMondThreadFactory : public IThreadFactory
+{
+public:
+  FThread*	Create( IRunnable* pRunnable )
+  {
+    return new FThread( NULL, pRunnable, FThread::TP_CRITICAL, 1024 );
+  }
+};
+
 class UsbMondEventsDispatcher::UsbMondChannelFactory : public FChannelFactory
 {
 public:
@@ -151,7 +165,7 @@ public:
 protected:
 	FChannel*		CreateChannel( IConnection* pIConnection ) const
 	{
-		UsbMondChannel* pUsbMondChannel = new UsbMondChannel( pIConnection );
+		UsbMondChannel* pUsbMondChannel = new UsbMondChannel( pIConnection, new UsbMondThreadFactory() );
 		
 		if ( pUsbMondChannel != NULL )
 		{
