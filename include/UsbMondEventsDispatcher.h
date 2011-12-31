@@ -51,6 +51,7 @@ public:
   
 private:
   class UsbMondChannel;
+  class UsbMondThreadFactory;
   class UsbMondChannelFactory;
   
 public:  
