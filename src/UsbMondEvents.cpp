@@ -277,8 +277,8 @@ ENTER( OnRun() )
 	  if ( sDevtype == "partition" )
 	  {
 	    FString    sMountPoint("NULL");
-	    double     dTotalSize     = 0.0;
-	    double     dAvailableSize = 0.0;
+	    double     dTotalSize     = -1.0;
+	    double     dAvailableSize = -1.0;
 
 	    switch( eAction )
 	    {
