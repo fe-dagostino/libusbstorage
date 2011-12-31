@@ -36,6 +36,10 @@ cp ./$CRON /opt/$PRGR/bin/
 echo "Change owner for /opt/$PRGR"
 chown -R $USER:$USER /opt/$PRGR
 
+echo "Make mount points .."
+mkdir /mnt/usbkey1
+mkdir /mnt/usbkey2
+
 #
 # Deamon configuration  
 #
