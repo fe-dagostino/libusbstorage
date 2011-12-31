@@ -18,8 +18,8 @@ mkdir cfg
 mkdir bin
 mkdir lib
 
-cp ../../config/$CONF                     ./cfg/
-cp ../../build-release/$PRGR              ./bin/
-cp ../../build-release/$PRGR1             ./bin/
-cp /usr/local/lib/libfedlibrary-3.0.0.so  ./lib/
+cp -v ../../config/$CONF                     ./cfg/
+cp -v ../../build-release/$PRGR              ./bin/
+cp -v ../../build-release/$PRGR1             ./bin/
+cp -v /usr/local/lib/libfedlibrary-3.0.0.so  ./lib/
 
