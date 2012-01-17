@@ -116,7 +116,10 @@ FString            UsbMondConfig::GetFileSystemOptions( const FString& sfs, BOOL
     FParameter*                   _pParameter = _iter.GetParameter();
     while ( _pParameter != NULL )
     {
-      _sRetVal += FString( 0, "%s=%s,", (const char*)_pParameter->GetName(), (const char*)_pParameter->GetValue(0) );
+      if ( _pParameter->GetCount() == 0 )
+	_sRetVal += FString( 0, "%s,", (const char*)_pParameter->GetName() );
+      else
+	_sRetVal += FString( 0, "%s=%s,", (const char*)_pParameter->GetName(), (const char*)_pParameter->GetValue(0) );
       
       _pParameter = _iter.GetParameter();
     }
