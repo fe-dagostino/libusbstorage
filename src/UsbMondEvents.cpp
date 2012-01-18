@@ -299,10 +299,11 @@ ENTER( OnRun() )
 		      FString  _sFsOpts = UsbMondConfig::GetInstance().GetFileSystemOptions( _sFs, NULL );
 		      
 		      
-		      LOG_INFO( FString( 0, "Try to mount [%s] --> [%s] fs[%s]", 
+		      LOG_INFO( FString( 0, "Try to mount [%s] --> [%s] fs[%s] opts[%s]", 
 							  (const char*)sDevnode, 
 							  (const char*)(*_iter),
-							  (const char*)_sFs ), 
+							  (const char*)_sFs,
+							  (const char*)_sFsOpts ),
 							  OnRun() )
 
 		      int iRetVal = mount( 
