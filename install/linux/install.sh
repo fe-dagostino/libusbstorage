@@ -18,17 +18,29 @@ CRON=check.cron
 # Deamon installation
 #
 echo "Create $PRGR nstallation tree ..."
-mkdir /opt/$PRGR
-mkdir /opt/$PRGR/bin
-echo "Create cfg directory ..."
-mkdir /opt/$PRGR/cfg
+if [ ! -d /opt/$PRGR ]
+then
+        mkdir /opt/$PRGR
+fi
+if [ ! -d /opt/$PRGR/bin ]
+then
+        mkdir /opt/$PRGR/bin
+fi
+if [ ! -d /opt/$PRGR/cfg ]
+then
+        echo "Create cfg directory ..."
+        mkdir /opt/$PRGR/cfg
+fi
+
+echo "Signaling exit to previous instance"
+pkill $PRGR
+
+echo "Copy dependencies ..."
+cp ./lib/*   /usr/local/lib/
+ldconfig
 
 echo "Copy deamon ..."
 cp ./bin/$PRGR   /opt/$PRGR/bin/
-
-echo "Copy deamon ..."
-cp ./lib/*   /usr/local/lib/
-ldconfig
 
 echo "Copy cron check version ..."
 cp ./$CRON /opt/$PRGR/bin/
@@ -37,8 +49,14 @@ echo "Change owner for /opt/$PRGR"
 chown -R $USER:$USER /opt/$PRGR
 
 echo "Make mount points .."
-mkdir /mnt/usbkey1
-mkdir /mnt/usbkey2
+if [ ! -d /mnt/usbkey1 ]
+then
+	mkdir /mnt/usbkey1
+fi
+if [ ! -d /mnt/usbkey2 ]
+then
+	mkdir /mnt/usbkey2
+fi
 
 #
 # Deamon configuration  
