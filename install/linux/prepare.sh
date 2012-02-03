@@ -24,4 +24,6 @@ cp -v ../../build-release/$PRGR              ./bin/
 cp -v ../../build-release/$PRGR1             ./bin/
 cp -v /usr/local/lib/libfedlibrary-3.0.0.so  ./lib/
 tar zcvf doc/html.tar.gz ../../docs/doxy/html
+find . -type f |xargs md5sum > md5.txt
+
 
