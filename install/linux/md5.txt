@@ -1,0 +1,10 @@
+c59f5123a4f450623e50d7837af9cfe8  ./cfg/usbmond.cfg
+0754abe521c7d0de3cd461e63c3f27a0  ./lib/libfedlibrary-3.0.0.so
+83ccdbc9ef9cad18cc6e0c20dd316b41  ./prepare.sh
+928f6e6f106c0142b9f39173e1f8e5a3  ./check.cron
+ca7451fdd624d66a1532bbe131de94d5  ./install.sh
+0e40613dad79f2e9c2fda009a71976ea  ./bin/usbdiskmon
+8b54e38d7949d7cb1a03854a267cb283  ./bin/usbmond
+1c01ea27e7866375472e1b90fb1718c9  ./cron.txt
+184679a118dfffb12e31038b67f62549  ./README
+9f33d5df933f3420d74e7816afb58d59  ./doc/html.tar.gz
