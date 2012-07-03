@@ -217,7 +217,7 @@ BOOL    UsbMondEventsDispatcher::Dispatch( const UsbMondHeader& rMsg )
   {
     if ( _pUsbMondChannel->Write( rMsg ) == FALSE )
     {
-      //@todo
+      ERROR_INFO( "An error occurs dispatching message to USB MONd Clients", Dispatch() )
     }
   }
 

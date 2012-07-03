@@ -350,9 +350,13 @@ ENTER( OnRun() )
 			  
 			  dTotalSize     = double(_nfoDisk.GetTotalBytes()    ) / 1073741824; 
 			  dAvailableSize = double(_nfoDisk.GetAvailableBytes()) / 1073741824;
+			  
+			  LOG_INFO( FString( 0, "Mount Point [%s] Total Size [%.2f] Available Size [%.2f]", (const char*)sMountPoint, dTotalSize, dAvailableSize ), OnRun() );
 			}
 			FCATCH( FFileSystemException, ex )
 			{
+			  ERROR_INFO( "Failed to initilize udev object.", OnRun() )  
+
 			}
 			
 			_bMounted   = true;
