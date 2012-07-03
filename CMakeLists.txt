@@ -13,7 +13,7 @@ ENDIF()
 
 IF( CMAKE_BUILD_TYPE STREQUAL "Debug" )
   set(  USBMOND_VERSION
-	-1.0.0-debug
+	-1.0.1-debug
     )
   set(  USBSTORAGE_VERSION
 	-1.0.0-debug
