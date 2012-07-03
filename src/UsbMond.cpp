@@ -33,7 +33,7 @@ UsbMond::UsbMond( int argc, char* argv[] )
                  TRUE,
                  new UsbMondEvents( *this ),
                  "Usb Monitor Daemon",
-                 MAKEVERSION( 1,0,0,0 ),
+                 MAKEVERSION( 1,0,1,0 ),
                  argc, argv
               )
 ENTER(UsbMond())
