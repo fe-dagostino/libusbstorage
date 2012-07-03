@@ -13,6 +13,8 @@ The script will install the program in /opt/usbmond
 "bin" subdir will contains usbmond and usbmond.cron
 -usbmond     : is the deamon compiled in release mode
 -usbmond.cron: used to create a cron job, this script will check for the process usbmond and if not running it will be executed.
+-usbdiskmon  : command line client application for usbmond. This application is intended in order to provide a debugging tool for
+               administrator or for user support.
 
 "cfg" subir will contains usbmond.cfg 
 -usbmond.cfg  : configuration file for recording deamon
