@@ -1,0 +1,29 @@
+NEW DEPENDECIES
+
+<none>
+
+NEW FUNCTIONALITIES ( v.1.0.1.0-r1 )
+
+1. updated cront.txt in order to start deamon immediatelly after reboot.
+
+FIXES
+
+<none>
+
+-------------------------------------------------------------------------------------------------------------------------------------------------
+
+NEW DEPENDECIES
+
+<none>
+
+NEW FUNCTIONALITIES ( v.1.0.1.0 )
+
+1. Introduced usbdiskmon in /opt/usbmond/bin/ this application is intended to be used as client side of usbmond. Together with log information 
+   it will provide a complete set of information for debugging purpose. This application requires usbmond to be active and can be executed as
+   simple user.
+2. Added some new log both a INFO level and ERROR level.
+
+
+FIXES
+
+<none>
