@@ -39,7 +39,7 @@ UsbMondChannel::UsbMondChannel(
 
 UsbMondChannel::~UsbMondChannel()
 {
-
+  
 }
 
 VOID	UsbMondChannel::OnDataReceived( const VOID* pData, DWORD dwDataLen )
