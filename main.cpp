@@ -38,27 +38,16 @@ class UsbEvents : public UsbStorageMonitorEvents
 int main (void)
 {
   UsbStorageMonitor _monUsbStorage;
-  FStopWatch        _swReqRelease;
 
   _monUsbStorage.Start( 
 			"127.0.0.1",
 			50000,
 			new UsbEvents() );
-  
-  _swReqRelease.Reset();
-  
+    
   while ( true )
   {
      printf( "Running .. \n" );
      FThread::Sleep( 10000 );
-     
-     if ( _swReqRelease.Peek() > 60 )
-     {
-       printf( "Request Partition Release for [/mnt/usbkey1] .. \n" );
-       _monUsbStorage.RequestPartitionRelease( "/mnt/usbkey1" );
-       
-       _swReqRelease.Reset();
-     }
   }
 
   return 0;       
