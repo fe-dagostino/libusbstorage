@@ -40,7 +40,9 @@ cp ./lib/*   /usr/local/lib/
 ldconfig
 
 echo "Copy deamon ..."
-cp ./bin/$PRGR   /opt/$PRGR/bin/
+cp ./bin/$PRGR       /opt/$PRGR/bin/
+echo "Copy disk mon utils ..."
+cp ./bin/usbdiskmon  /opt/$PRGR/bin/
 
 echo "Copy cron check version ..."
 cp ./$CRON /opt/$PRGR/bin/
