@@ -56,15 +56,34 @@ public:
     BOOL bRetVal = FALSE;
     FTRY
     {
-      bRetVal = GetConnection()->Write( FData(	
-				      &rMsg, 
-				      (DWORD)rMsg.size
-				    ) 
-			    );
+      if ( GetConnection() != NULL )
+      {
+	bRetVal = GetConnection()->Write( FData(	
+					&rMsg, 
+					(DWORD)rMsg.size
+				      ) 
+			      );
+      }
     }
     FCATCH( FChannelException, ex ) 
     {
-      //@todo
+#ifdef _TRACING_EXCEPTION_CATCH
+      if ( FLogger::IsValid() )
+      {
+	FLogMailbox* _pLogMbx = FLogger::GetInstance().GetGlobalMailbox();
+	
+	if ( _pLogMbx->TestLogMessageFlag( FLogMessage::MT_TRACE_EXCEPTION ) )
+	{
+	  FLogMessage* pLogMessage = new FLogMessage( _pLogMbx->GetName(), FLogMessage::MT_CATCH_EXCEPTION, "UsbMondChannel", "Write", ex.GetMessage() );
+	  _pLogMbx->Write(pLogMessage); 
+	}
+      }
+#endif
+    }
+    
+    if ( bRetVal == FALSE )
+    {
+      Finalize();
     }
     
     return bRetVal;
