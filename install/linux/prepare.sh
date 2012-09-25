@@ -19,7 +19,7 @@ mkdir bin
 mkdir lib
 mkdir doc
 
-cp -v ../../config/$CONF                     ./cfg/
+#cp -v ../../config/$CONF                     ./cfg/
 cp -v ../../build-release/$PRGR              ./bin/
 cp -v ../../build-release/$PRGR1             ./bin/
 cp -v /usr/local/lib/libfedlibrary-3.0.0.so  ./lib/
