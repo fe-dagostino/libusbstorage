@@ -13,10 +13,10 @@ ENDIF()
 
 IF( CMAKE_BUILD_TYPE STREQUAL "Debug" )
   set(  USBMOND_VERSION
-	-1.0.2-debug
+	-1.0.3-debug
     )
   set(  USBSTORAGE_VERSION
-	-1.0.0-debug
+	-1.0.1-debug
     )
   set(  FEDLIB_VER
         -3.0.0-debug
@@ -25,7 +25,7 @@ ELSE()
   set(  USBMOND_VERSION
     )
   set(  USBSTORAGE_VERSION
-	-1.0.0
+	-1.0.1
     )
   set(  FEDLIB_VER
         -3.0.0
