@@ -109,8 +109,6 @@ VOID	UsbStorageMonitor::Run()
       continue;
     }
 
-    m_mtxMonitor.EnterMutex();
-
     struct   timeval timeout  = { 1/*tv.tv_sec*/, 0/*tv.tv_usec*/ }; 
     
     WORD     _wResult = 0;
@@ -129,8 +127,6 @@ VOID	UsbStorageMonitor::Run()
       if ( m_bRaiseEvents )
 	m_pUsbStorageMonitorEvents->OnErrorOccurs();  
       
-      // Release mutex 
-      m_mtxMonitor.LeaveMutex();
       // Favorite context switch
       FThread::YieldThread();
       continue;
@@ -138,8 +134,6 @@ VOID	UsbStorageMonitor::Run()
 
     if ( _wResult & FSocket::TIME_OUT_OCCUR )
     {
-      // Release mutex 
-      m_mtxMonitor.LeaveMutex();
       // Favorite context switch
       FThread::YieldThread();
       continue;
@@ -150,8 +144,6 @@ VOID	UsbStorageMonitor::Run()
       delete m_pSocket;
       m_pSocket = NULL;
 
-      // Release mutex 
-      m_mtxMonitor.LeaveMutex();
       // Favorite context switch
       FThread::YieldThread();
       continue;
@@ -173,8 +165,6 @@ VOID	UsbStorageMonitor::Run()
 	  delete m_pSocket;
 	  m_pSocket = NULL;
 	  
-	  // Release mutex 
-	  m_mtxMonitor.LeaveMutex();
 	  // Favorite context switch
 	  FThread::YieldThread();	  
 	  continue;
@@ -258,8 +248,6 @@ VOID	UsbStorageMonitor::Run()
       }
     }
     
-    // Release mutex 
-    m_mtxMonitor.LeaveMutex();
     // Favorite context switch
     FThread::YieldThread();
   }// while ( !m_bExit )
