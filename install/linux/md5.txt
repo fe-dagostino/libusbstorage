@@ -1,11 +1,11 @@
-30a3c46e3bfdf4c2beadb0e07bb2bf8c  ./doc/html.tar.gz
+f8f35dbe4767111ac62c2d50fa4b97f7  ./doc/html.tar.gz
 61c5a18e22a2b29cc3bf31d3df330c39  ./prepare.sh
 a52dcd968f415bbb034e217479af2eaa  ./cron.txt
 fe9aabee416142ce738b00d186a925fe  ./cfg/usbmond.cfg
-d28952f790c4f7d73a2e97005d19e1d3  ./bin/usbdiskmon
-2f619b34e970aa89a087a4c06955688e  ./bin/usbmond
-87b08be58e8e2f628ac58d2f0d824703  ./md5.txt
+0da629546c729b48452d7ff2fd9a0089  ./bin/usbdiskmon
+d3ff4213f43785cb8cbfa48a220852d1  ./bin/usbmond
+10b258d6bebd7853e3177aee46e93494  ./md5.txt
 928f6e6f106c0142b9f39173e1f8e5a3  ./check.cron
 d8824dea0f4f18d7d0ecd295e74124d8  ./README
-ca7451fdd624d66a1532bbe131de94d5  ./install.sh
+a77378c70328f616c7d42dec8084be60  ./install.sh
 328994608231637c2f17813d4f4a54bb  ./lib/libfedlibrary-3.0.0.so
