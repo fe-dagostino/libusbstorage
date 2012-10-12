@@ -113,7 +113,32 @@ protected:
       {
 	const UsbMondRequestPartitionRelease* pReqPartRel = (const UsbMondRequestPartitionRelease*)pData;
 	
+        if ( FLogger::IsValid() )
+        {
+          FLogMailbox* _pLogMbx = FLogger::GetInstance().GetGlobalMailbox();
+
+          if ( _pLogMbx->TestLogMessageFlag( FLogMessage::MT_LOGGING_INFO ) )
+          {
+            FString      sMsg( 0, "SYSCALL unmount(%s)",  pReqPartRel->mountpoint );
+            FLogMessage* pLogMessage = new FLogMessage( _pLogMbx->GetName(), FLogMessage::MT_LOGGING_INFO, "UsbMondChannel", "OnDataReceived", sMsg );
+            _pLogMbx->Write(pLogMessage);
+          }
+        }
+
 	int _iRetVal = umount( pReqPartRel->mountpoint );
+
+        if ( FLogger::IsValid() )
+        {
+          FLogMailbox* _pLogMbx = FLogger::GetInstance().GetGlobalMailbox();
+
+          if ( _pLogMbx->TestLogMessageFlag( FLogMessage::MT_LOGGING_INFO ) )
+          {
+            FString      sMsg( 0, "SYSCALL unmount(%s) RETVAL[%d]",  pReqPartRel->mountpoint, _iRetVal );
+            FLogMessage* pLogMessage = new FLogMessage( _pLogMbx->GetName(), FLogMessage::MT_LOGGING_INFO, "UsbMondChannel", "OnDataReceived", sMsg );
+            _pLogMbx->Write(pLogMessage);
+          }
+        }
+
 	
 	UsbMondNotifyPartitionReleased        notifyParRel( pReqPartRel->mountpoint, (_iRetVal==0));
 	
