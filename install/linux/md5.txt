@@ -1,11 +1,11 @@
-f8f35dbe4767111ac62c2d50fa4b97f7  ./doc/html.tar.gz
-61c5a18e22a2b29cc3bf31d3df330c39  ./prepare.sh
+1a8261bb683babfaede3b13c55c5cf42  ./doc/html.tar.gz
+d6de5a5c435ebf355d8a4c46907bf34c  ./prepare.sh
 a52dcd968f415bbb034e217479af2eaa  ./cron.txt
 fe9aabee416142ce738b00d186a925fe  ./cfg/usbmond.cfg
-0da629546c729b48452d7ff2fd9a0089  ./bin/usbdiskmon
-d3ff4213f43785cb8cbfa48a220852d1  ./bin/usbmond
-10b258d6bebd7853e3177aee46e93494  ./md5.txt
+9bd5e7f67c534822f0f4b4c8c7af1f17  ./bin/usbdiskmon
+c281da529a2394968be25d4a79844331  ./bin/usbmond
+3a5c0e6bac0a05da0b45aca2c541537d  ./md5.txt
 928f6e6f106c0142b9f39173e1f8e5a3  ./check.cron
 d8824dea0f4f18d7d0ecd295e74124d8  ./README
 a77378c70328f616c7d42dec8084be60  ./install.sh
-328994608231637c2f17813d4f4a54bb  ./lib/libfedlibrary-3.0.0.so
+681de15b877e47f50a362234b1b412f6  ./lib/libfedlibrary-3.0.1.so
