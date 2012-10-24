@@ -1,0 +1,74 @@
+NEW DEPENDECIES
+
+<none>
+
+NEW FUNCTIONALITIES ( v.1.0.5.0 )
+
+1. (deamon) introduced errno log in presence of umount failures.
+
+FIXES
+
+<none>
+
+-------------------------------------------------------------------------------------------------------------------------------------------------
+
+NEW DEPENDECIES
+
+<none>
+
+NEW FUNCTIONALITIES ( v.1.0.4.0 )
+
+1. (deamon) introduced debug function on disk log device.
+
+FIXES
+
+<none>
+
+-------------------------------------------------------------------------------------------------------------------------------------------------
+
+NEW DEPENDECIES
+
+<none>
+
+NEW FUNCTIONALITIES ( v.1.0.3.0 )
+
+1. (deamon) introduced more logs on unmounting.
+2. (lib)    removed lock on reading.
+
+FIXES
+
+<none>
+
+-------------------------------------------------------------------------------------------------------------------------------------------------
+
+NEW DEPENDECIES
+
+<none>
+
+NEW FUNCTIONALITIES ( v.1.0.2.0 )
+
+1. updated cront.txt in order to start deamon immediatelly after reboot.
+2. updated install.sh in order to copy usbdickmon tool
+3. introduced more logs.
+
+FIXES
+
+<none>
+
+-------------------------------------------------------------------------------------------------------------------------------------------------
+
+NEW DEPENDECIES
+
+<none>
+
+NEW FUNCTIONALITIES ( v.1.0.1.0 )
+
+1. Introduced usbdiskmon in /opt/usbmond/bin/ this application is intended to be used as client side of usbmond. Together with log information 
+   it will provide a complete set of information for debugging purpose. This application requires usbmond to be active and can be executed as
+   simple user.
+2. Added some new log both a INFO level and ERROR level.
+
+
+FIXES
+
+<none>
