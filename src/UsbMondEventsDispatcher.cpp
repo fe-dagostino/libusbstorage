@@ -119,13 +119,17 @@ protected:
 
           if ( _pLogMbx->TestLogMessageFlag( FLogMessage::MT_LOGGING_INFO ) )
           {
-            FString      sMsg( 0, "SYSCALL unmount(%s)",  pReqPartRel->mountpoint );
+            FString      sMsg( 0, "SYSCALL umount(%s)",  pReqPartRel->mountpoint );
             FLogMessage* pLogMessage = new FLogMessage( _pLogMbx->GetName(), FLogMessage::MT_LOGGING_INFO, "UsbMondChannel", "OnDataReceived", sMsg );
             _pLogMbx->Write(pLogMessage);
           }
         }
 
-	int _iRetVal = umount( pReqPartRel->mountpoint );
+        // The sync() function shall cause all information in memory that updates 
+        // file systems to be scheduled for writing out to all file systems. 
+	sync();
+
+	int _iRetVal = umount2( pReqPartRel->mountpoint, MNT_DETACH );
 
         if ( FLogger::IsValid() )
         {
@@ -133,7 +137,12 @@ protected:
 
           if ( _pLogMbx->TestLogMessageFlag( FLogMessage::MT_LOGGING_INFO ) )
           {
-            FString      sMsg( 0, "SYSCALL unmount(%s) RETVAL[%d]",  pReqPartRel->mountpoint, _iRetVal );
+            FString      sMsg;
+            if ( _iRetVal >= 0 )
+              sMsg.Format( 0, "SYSCALL umount(%s) RETVAL[%d]",  pReqPartRel->mountpoint, _iRetVal );
+            else
+              sMsg.Format( 0, "SYSCALL umount(%s) RETVAL[%d] ERRNO[%d]",  pReqPartRel->mountpoint, _iRetVal, errno );
+
             FLogMessage* pLogMessage = new FLogMessage( _pLogMbx->GetName(), FLogMessage::MT_LOGGING_INFO, "UsbMondChannel", "OnDataReceived", sMsg );
             _pLogMbx->Write(pLogMessage);
           }
