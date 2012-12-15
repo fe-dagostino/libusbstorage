@@ -81,11 +81,6 @@ public:
 #endif
     }
     
-    if ( bRetVal == FALSE )
-    {
-      Finalize();
-    }
-    
     return bRetVal;
   }
   
