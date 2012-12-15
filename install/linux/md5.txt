@@ -1,10 +1,10 @@
-6453a5c7a132595377fd5daf5be480fd  ./doc/html.tar.gz
+a1ca15e3d57f5f3930ac1735548d37eb  ./doc/html.tar.gz
 d6de5a5c435ebf355d8a4c46907bf34c  ./prepare.sh
 a52dcd968f415bbb034e217479af2eaa  ./cron.txt
 fe9aabee416142ce738b00d186a925fe  ./cfg/usbmond.cfg
-9bd5e7f67c534822f0f4b4c8c7af1f17  ./bin/usbdiskmon
-2cc6efa08b878a394dcd38093b30fbcc  ./bin/usbmond
-32ff78ca826a21678d4730dc5ef3c9ad  ./md5.txt
+eb8d524fe1daa2fecb372153a2ffbc39  ./bin/usbdiskmon
+d1bcff2075535fcdb924eb1e1ad38aad  ./bin/usbmond
+098474519fed37002944e7c653f8f8a1  ./md5.txt
 928f6e6f106c0142b9f39173e1f8e5a3  ./check.cron
 d8824dea0f4f18d7d0ecd295e74124d8  ./README
 a77378c70328f616c7d42dec8084be60  ./install.sh
