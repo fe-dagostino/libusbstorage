@@ -79,8 +79,6 @@ VOID	UsbMondChannel::OnDataReceived( const VOID* pData, DWORD dwDataLen )
     FCATCH( FChannelException, ex )
     {
       TRACE_EXCEPTION_CATCH( ex, OnDataReceived() );
-
-      Finalize();
     }
 
   }//if ( _pRciParserInfo )
