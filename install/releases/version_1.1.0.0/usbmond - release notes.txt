@@ -9,7 +9,7 @@ NEW FUNCTIONALITIES ( v.1.1.0.0 )
 
 FIXES
 
-1. (deamon) fixed implementation on for connection threads.
+1. (deamon) fixed implementation for connection threads.
 2. removed extra char from log files.
 
 -------------------------------------------------------------------------------------------------------------------------------------------------
