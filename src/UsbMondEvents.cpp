@@ -79,21 +79,21 @@ ENTER( OnStart() )
   // Create an instace for a Log device over TCP.
   // The device will accept row tcp connection on port 10000 on each active interface.
   ILogDevice* _pLogDevice0 = new FTcpLogDevice( 
-			      "TCP", 
-			      UsbMondConfig::GetInstance().GetLogServerAddress( NULL ), // Default "127.0.0.1" 
-			      UsbMondConfig::GetInstance().GetLogServerPort( NULL ),    // Default 55000 
-			      pLogMessageColorization 
-			);
+                    "TCP",
+                    UsbMondConfig::GetInstance().GetLogServerAddress( NULL ), // Default "127.0.0.1"
+                    UsbMondConfig::GetInstance().GetLogServerPort( NULL ),    // Default 55000
+                    pLogMessageColorization
+                );
 
   ILogDevice* _pLogDevice1 = new FDiskLogDevice( 
-			      "DSK", 
-			      0xFFFFFFFF,
-			      UsbMondConfig::GetInstance().GetLogDiskPath( NULL ),
-			      UsbMondConfig::GetInstance().GetLogDiskPrefix( NULL ),
-			      UsbMondConfig::GetInstance().GetLogDiskExtension( NULL ),
-			      UsbMondConfig::GetInstance().GetLogDiskFiles( NULL ),
-			      UsbMondConfig::GetInstance().GetLogDiskFileSizeLimit( NULL )
-			);
+                    "DSK",
+                    0xFFFFFFFF,
+                    UsbMondConfig::GetInstance().GetLogDiskPath( NULL ),
+                    UsbMondConfig::GetInstance().GetLogDiskPrefix( NULL ),
+                    UsbMondConfig::GetInstance().GetLogDiskExtension( NULL ),
+                    UsbMondConfig::GetInstance().GetLogDiskFiles( NULL ),
+                    UsbMondConfig::GetInstance().GetLogDiskFileSizeLimit( NULL )
+                );
 #ifdef _DEBUG 
   ILogDevice* _pLogDevice2 = new FConsoleLogDevice( "CON", pLogMessageColorization );
 #endif
@@ -138,7 +138,7 @@ EXIT
 VOID UsbMondEvents::OnRun(const FService* pService)
 ENTER( OnRun() )
 
-  UsbMond* _pService =  (UsbMond*)pService;
+  (void)pService;
 
   struct udev         *udev = NULL;
   struct udev_monitor *mon  = NULL;
@@ -155,12 +155,12 @@ ENTER( OnRun() )
       udev = udev_new();
       if (!udev) 
       {
-	udev_unref(udev);
-	udev = NULL;
-	
-	ERROR_INFO( "Failed to initilize udev object.", OnRun() )  
-	
-	continue;
+        udev_unref(udev);
+        udev = NULL;
+
+        ERROR_INFO( "Failed to initilize udev object.", OnRun() )
+
+        continue;
       }
     
       /**
@@ -169,12 +169,12 @@ ENTER( OnRun() )
       mon = udev_monitor_new_from_netlink(udev, "udev");
       if ( mon == NULL )
       {
-	udev_unref(udev);
-	udev = NULL;
-	
-	ERROR_INFO( "Failed to connect netlink.", OnRun() )  
-	
-	continue;
+        udev_unref(udev);
+        udev = NULL;
+
+        ERROR_INFO( "Failed to connect netlink.", OnRun() )
+
+        continue;
       }
       
       /**
@@ -182,17 +182,17 @@ ENTER( OnRun() )
        */
 
       if ( 
-	  ( udev_monitor_filter_add_match_subsystem_devtype(mon, "usb"  , "usb_device") != 0 ) ||
-	  ( udev_monitor_filter_add_match_subsystem_devtype(mon, "block", "disk"      ) != 0 ) ||
-	  ( udev_monitor_filter_add_match_subsystem_devtype(mon, "block", "partition" ) != 0 )
+            ( udev_monitor_filter_add_match_subsystem_devtype(mon, "usb"  , "usb_device") != 0 ) ||
+            ( udev_monitor_filter_add_match_subsystem_devtype(mon, "block", "disk"      ) != 0 ) ||
+            ( udev_monitor_filter_add_match_subsystem_devtype(mon, "block", "partition" ) != 0 )
          )
       {
-	udev_unref(udev);
-	udev = NULL;
-	
-	ERROR_INFO( "Failed to add filters.", OnRun() )  
-	
-	continue;
+        udev_unref(udev);
+        udev = NULL;
+
+        ERROR_INFO( "Failed to add filters.", OnRun() )
+
+        continue;
       }
 
       /**
@@ -200,12 +200,12 @@ ENTER( OnRun() )
        */
       if ( udev_monitor_enable_receiving(mon) != 0 )
       {
-	udev_unref(udev);
-	udev = NULL;
-	
-	ERROR_INFO( "Failed to enable receaving.", OnRun() )  
-	
-	continue;
+        udev_unref(udev);
+        udev = NULL;
+
+        ERROR_INFO( "Failed to enable receaving.", OnRun() )
+
+        continue;
       }
       
       /**
@@ -245,187 +245,188 @@ ENTER( OnRun() )
       dev = udev_monitor_receive_device(mon);
       if (dev)
       {
-	  eUsbAction eAction  = strtoaction( udev_device_get_action(dev) );
-	  FString    sDevnode   ( udev_device_get_devnode(dev)   );
-	  FString    sSubsystem ( udev_device_get_subsystem(dev) );
-	  FString    sDevtype   ( udev_device_get_devtype(dev)   );
+        eUsbAction eAction  = strtoaction( udev_device_get_action(dev) );
+        FString    sDevnode   ( udev_device_get_devnode(dev)   );
+        FString    sSubsystem ( udev_device_get_subsystem(dev) );
+        FString    sDevtype   ( udev_device_get_devtype(dev)   );
 
-	  if ( sDevtype == "usb_device" )
-	  {
-	    UsbMondNotifyUsbDevice _devInfo(
-				      eAction,
-				      (const char*)sSubsystem,
-				      (const char*)sDevtype,
-				      (const char*)sDevnode
-				    );
-						    
-	    UsbMondEventsDispatcher::GetInstance().Dispatch( _devInfo );
-	  }
-	  
-	  if ( sDevtype == "disk" )
-	  {
-	    UsbMondNotifyDisk _devInfo(
-				      eAction,
-				      (const char*)sSubsystem,
-				      (const char*)sDevtype,
-				      (const char*)sDevnode
-				    );
-						    
-	    UsbMondEventsDispatcher::GetInstance().Dispatch( _devInfo );
-	  }
-	  
-	  if ( sDevtype == "partition" )
-	  {
-	    FString    sMountPoint("NULL");
-	    double     dTotalSize     = -1.0;
-	    double     dAvailableSize = -1.0;
+        if ( sDevtype == "usb_device" )
+        {
+          UsbMondNotifyUsbDevice _devInfo(
+                                    eAction,
+                                    (const char*)sSubsystem,
+                                    (const char*)sDevtype,
+                                    (const char*)sDevnode
+            );
 
-	    switch( eAction )
-	    {
-	      case eAdd:
-	      {
-		FTList<FString >::Iterator _iter     = m_listMountPoints.Begin();
-		bool                       _bMounted = false;
-		
-		while( _iter && (_bMounted==false) )
-		{
-		  const FParameter* pFileSystems = UsbMondConfig::GetInstance().GetSupportedFileSystems( NULL );
-		  if ( pFileSystems != NULL )
-		  {
-		    for ( DWORD dwNdx = 0;  dwNdx < pFileSystems->GetCount(); dwNdx++ )
-		    {
-		      // FileSystem
-		      FString  _sFs     = pFileSystems->GetValue(dwNdx);
-		      FString  _sFsOpts = UsbMondConfig::GetInstance().GetFileSystemOptions( _sFs, NULL );
-		      
-		      
-		      LOG_INFO( FString( 0, "Try to mount [%s] --> [%s] fs[%s] opts[%s]", 
-							  (const char*)sDevnode, 
-							  (const char*)(*_iter),
-							  (const char*)_sFs,
-							  (const char*)_sFsOpts ),
-							  OnRun() )
+          UsbMondEventsDispatcher::GetInstance().Dispatch( _devInfo );
+        }
 
-		      int iRetVal = mount( 
-				    (const char*)sDevnode,
-				    (const char*)(*_iter),
-				    (const char*)_sFs,
-				    S_WRITE,
-				    (const char*)_sFsOpts
-				  );
-				  
-		      if ( iRetVal == 0 )
-		      {
-			MNT_MAP::iterator _mapIter = m_mapMntInfos.find( (const char*)sDevnode );
-			
-			// Check if specified item already exist
-			if ( _mapIter == m_mapMntInfos.end() )
-			{
-			  MntInfo* pMntInfo = new MntInfo( sDevnode, (*_iter) );
-			  
-			  m_mapMntInfos[ (const char*)pMntInfo->sDevNode ] = pMntInfo;
-			}
-			else //Update existing device with new mount point
-			{
-			  MntInfo* pMntInfo  = _mapIter->second;
-			  
-			  pMntInfo->sMountPoint = (*_iter);
-			}
-			
-			// Store current mount point in a local variable
-			sMountPoint = (*_iter);
+        if ( sDevtype == "disk" )
+        {
+          UsbMondNotifyDisk _devInfo(
+                                    eAction,
+                                    (const char*)sSubsystem,
+                                    (const char*)sDevtype,
+                                    (const char*)sDevnode
+            );
 
-			FTRY
-			{
-			  FDiskInfo  _nfoDisk;
-			  FFileSystem::GetDiskInfo( sMountPoint, _nfoDisk );
-			  
-			  ////////////////////////////////////////////
-			  // Following values are repoted here in order to clarify operations 
-			  //
-			  // 1 Byte     = 8 Bits
-			  // 1 Kilobyte = 1024 Bytes
-			  // 1 Megabyte = 1048576 Bytes
-			  // 1 Gigabyte = 1073741824 Bytes
-			  
-			  dTotalSize     = double(_nfoDisk.GetTotalBytes()    ) / 1073741824; 
-			  dAvailableSize = double(_nfoDisk.GetAvailableBytes()) / 1073741824;
-			  
-			  LOG_INFO( FString( 0, "Mount Point [%s] Total Size [%.2f] Available Size [%.2f]", (const char*)sMountPoint, dTotalSize, dAvailableSize ), OnRun() );
-			}
-			FCATCH( FFileSystemException, ex )
-			{
-			  ERROR_INFO( "Failed to initilize udev object.", OnRun() )  
+          UsbMondEventsDispatcher::GetInstance().Dispatch( _devInfo );
+        }
 
-			}
-			
-			_bMounted   = true;
-			break;
-		      }
-		      else
-		      {
-			ERROR_INFO( FString( 0, "Failed to mount [%s] --> [%s] fs[%s] code[%d]", 
-								      (const char*)sDevnode, 
-								      (const char*)(*_iter),
-								      (const char*)_sFs,
-								      iRetVal ), OnRun() );
-								      
-			// Failed to mount current mount point, so we will try on next
-			// mount point.
-			_iter++;
-		      }
-		    }// for
-		  }//if ( pFileSystems != NULL )
-		  else
-		  {
-		    ERROR_INFO( "No File Systems has been specified in configuration", OnRun() );
-		  }
-		}
-	      }; break;
+        if ( sDevtype == "partition" )
+        {
+            FString    sMountPoint("NULL");
+            double     dTotalSize     = -1.0;
+            double     dAvailableSize = -1.0;
 
-	      case eRemove:
-	      {
-		LOG_INFO( FString( 0, "Removed device [%s] ", (const char*)sDevnode ), OnRun() )
+        switch( eAction )
+        {
+          case eAdd:
+          {
+            FTList<FString >::Iterator _iter     = m_listMountPoints.Begin();
+            bool                       _bMounted = false;
 
-		MNT_MAP::iterator _mapIter = m_mapMntInfos.find( (const char*)sDevnode );
-		// Check if specified item already exist
-		if ( _mapIter != m_mapMntInfos.end() )
-		{
-		  MntInfo* pMntInfo  = _mapIter->second;
-		  
-		  int iRetVal = umount( (const char*)pMntInfo->sMountPoint );
-		  if ( iRetVal == 0 )
-		  {
-		  }
-		  
-		  m_mapMntInfos.erase( _mapIter );
-		  
-		  delete pMntInfo;
-		}
+            while( _iter && (_bMounted==false) )
+            {
+              const FParameter* pFileSystems = UsbMondConfig::GetInstance().GetSupportedFileSystems( NULL );
+              if ( pFileSystems != NULL )
+              {
+                for ( DWORD dwNdx = 0;  dwNdx < pFileSystems->GetCount(); dwNdx++ )
+                {
+                    // FileSystem
+                    FString  _sFs     = pFileSystems->GetValue(dwNdx);
+                    FString  _sFsOpts = UsbMondConfig::GetInstance().GetFileSystemOptions( _sFs, NULL );
 
-	      }; break;
-	    }
-	    
-	    UsbMondNotifyPartition _devInfo(
-					      eAction,
-					      (const char*)sSubsystem,
-					      (const char*)sDevtype,
-					      (const char*)sDevnode,
-					      (const char*)sMountPoint,
-					      dTotalSize,
-					      dAvailableSize
-					    );
-						    
-	    UsbMondEventsDispatcher::GetInstance().Dispatch( _devInfo );
-	  } //if ( sDevtype == "partition" )
+                    LOG_INFO( FString( 0, "Try to mount [%s] --> [%s] fs[%s] opts[%s]",
+                                        (const char*)sDevnode,
+                                        (const char*)(*_iter),
+                                        (const char*)_sFs,
+                                        (const char*)_sFsOpts ),
+                                        OnRun() )
 
-	  
-	  udev_device_unref(dev);
+                    int iRetVal = mount(
+                            (const char*)sDevnode,
+                            (const char*)(*_iter),
+                            (const char*)_sFs,
+                            MS_DIRSYNC,
+                            (const char*)_sFsOpts
+                            );
+
+                    if ( iRetVal == 0 )
+                    {
+                        MNT_MAP::iterator _mapIter = m_mapMntInfos.find( (const char*)sDevnode );
+
+                        // Check if specified item already exist
+                        if ( _mapIter == m_mapMntInfos.end() )
+                        {
+                            MntInfo* pMntInfo = new MntInfo( sDevnode, (*_iter) );
+
+                            m_mapMntInfos[ (const char*)pMntInfo->sDevNode ] = pMntInfo;
+                        }
+                        else //Update existing device with new mount point
+                        {
+                            MntInfo* pMntInfo  = _mapIter->second;
+
+                            pMntInfo->sMountPoint = (*_iter);
+                        }
+
+                        // Store current mount point in a local variable
+                        sMountPoint = (*_iter);
+
+                        FTRY
+                        {
+                        FDiskInfo  _nfoDisk;
+                        FFileSystem::GetDiskInfo( sMountPoint, _nfoDisk );
+
+                        ////////////////////////////////////////////
+                        // Following values are repoted here in order to clarify operations
+                        //
+                        // 1 Byte     = 8 Bits
+                        // 1 Kilobyte = 1024 Bytes
+                        // 1 Megabyte = 1048576 Bytes
+                        // 1 Gigabyte = 1073741824 Bytes
+
+                        dTotalSize     = double(_nfoDisk.GetTotalBytes()    ) / 1073741824;
+                        dAvailableSize = double(_nfoDisk.GetAvailableBytes()) / 1073741824;
+
+                        LOG_INFO( FString( 0, "Mount Point [%s] Total Size [%.2f] Available Size [%.2f]", (const char*)sMountPoint, dTotalSize, dAvailableSize ), OnRun() );
+                        }
+                        FCATCH( FFileSystemException, ex )
+                        {
+                        ERROR_INFO( "Failed to initilize udev object.", OnRun() )
+                        }
+
+                        _bMounted   = true;
+                        break;
+                    }
+                    else
+                    {
+                        ERROR_INFO( FString( 0, "Failed to mount [%s] --> [%s] fs[%s] code[%d]",
+                                                (const char*)sDevnode,
+                                                (const char*)(*_iter),
+                                                (const char*)_sFs,
+                                                iRetVal ), OnRun() );
+
+                        // Failed to mount current mount point, so we will try on next
+                        // mount point.
+                        _iter++;
+                    }
+                }// for
+              }//if ( pFileSystems != NULL )
+              else
+              {
+                ERROR_INFO( "No File Systems has been specified in configuration", OnRun() );
+              }
+            } // while
+          }; break;
+
+          case eRemove:
+          {
+            LOG_INFO( FString( 0, "Removed device [%s] ", (const char*)sDevnode ), OnRun() )
+
+            MNT_MAP::iterator _mapIter = m_mapMntInfos.find( (const char*)sDevnode );
+            // Check if specified item already exist
+            if ( _mapIter != m_mapMntInfos.end() )
+            {
+                MntInfo* pMntInfo  = _mapIter->second;
+
+                int iRetVal = umount( (const char*)pMntInfo->sMountPoint );
+                if ( iRetVal == 0 )
+                {
+                }
+
+                m_mapMntInfos.erase( _mapIter );
+
+                delete pMntInfo;
+            }
+          }; break;
+
+          default:
+          {
+            LOG_INFO( FString( 0, "Undefined actions for device [%s] ", (const char*)sDevnode ), OnRun() )
+          }; break;
+        } //switch( eAction )
+
+        UsbMondNotifyPartition _devInfo(
+                            eAction,
+                            (const char*)sSubsystem,
+                            (const char*)sDevtype,
+                            (const char*)sDevnode,
+                            (const char*)sMountPoint,
+                            dTotalSize,
+                            dAvailableSize
+                        );
+
+        UsbMondEventsDispatcher::GetInstance().Dispatch( _devInfo );
+        } //if ( sDevtype == "partition" )
+
+        udev_device_unref(dev);
       }
       else 
       {
-	ERROR_INFO( "Failed to receive device.", OnRun() )  
-      }					
+        ERROR_INFO( "Failed to receive device.", OnRun() )
+      }
     }
     
     // Suspend execution for 100 ms
