@@ -5,12 +5,23 @@ include_directories( ./include/ )
 include_directories( ${CMAKE_INSTALL_PREFIX}/include/fedlibrary/include )
 include_directories( ${CMAKE_INSTALL_PREFIX}/include/fedlibrary/template_include )
 
+###
+# Dependencies
+###
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+
+find_package(LIBUDEV REQUIRED)
+
+IF(NOT LIBUDEV_FOUND)
+  message(FATAL_ERROR "Couldn't find libudev.")
+ENDIF()
 
 IF(NOT CMAKE_BUILD_TYPE )
   SET(CMAKE_BUILD_TYPE Release CACHE STRING
     "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel."
     FORCE)
 ENDIF()
+
 
 IF( CMAKE_BUILD_TYPE STREQUAL "Debug" )
   set(  USBMOND_VERSION
