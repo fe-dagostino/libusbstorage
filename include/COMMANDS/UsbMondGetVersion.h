@@ -58,6 +58,9 @@ public:
 
   RciResponse        Execute( FChannel& rChannel, const FArguments& rArgs, FArguments& rResults ) const
   {
+    (void)rChannel;
+    (void)rArgs;
+
     UsbMondResult& _rResults = (UsbMondResult&)rResults;
     RciResponse    _retVal   = rciOk;                        //Default value
 
