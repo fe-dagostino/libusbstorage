@@ -1,7 +1,7 @@
 # libusbstorage
 USB Storage utility 
 
-Library become useful if your application require to monitor external usbstorage and to mount at a specifiedmount point.
+This library become useful if your application require to monitor external usbstorage and to mount at a specifiedmount point.
 
 # Build instructions
 
