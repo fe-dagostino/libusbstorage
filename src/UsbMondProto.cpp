@@ -150,6 +150,36 @@ UsbMondRequestPartitionRelease::UsbMondRequestPartitionRelease( const char* moun
   strncpy( this->mountpoint, mountpoint, sizeof(this->mountpoint) );
 }
 
+const char* msgtostr( eUsbMessages eMsg )
+{
+  switch( eMsg )
+  {
+    case eMsgUndefined:
+        return "eMsgUndefined";
+    case eMsgNotifyUsbDeviceEvent:
+        return "eMsgNotifyUsbDeviceEvent";
+    case eMsgNotifyUsbDeviceEventAnswer:
+        return "eMsgNotifyUsbDeviceEventAnswer";
+    case eMsgNotifyDiskEvent:
+        return "eMsgNotifyDiskEvent";
+    case eMsgNotifyDiskEventAnswer:
+        return "eMsgNotifyDiskEventAnswer";
+    case eMsgNotifyPartitionEvent:
+        return "eMsgNotifyPartitionEvent";
+    case eMsgNotifyPartitionEventAnswer:
+        return "eMsgNotifyPartitionEventAnswer";
+    case eMsgNotifyPartitionReleasedEvent:
+        return "eMsgNotifyPartitionReleasedEvent";
+    case eMsgNotifyPartitionReleasedEventAnswer:
+        return "eMsgNotifyPartitionReleasedEventAnswer";
+    case eMsgRequestPartitionRelease:
+        return "eMsgRequestPartitionRelease";
+    case eMsgRequestPartitionReleaseAnswer:
+        return "eMsgRequestPartitionReleaseAnswer";
+  }
+
+  return "UNMANAGED";
+}
 
 eUsbAction strtoaction( const char* pAction )
 {

@@ -134,6 +134,7 @@ struct UsbMondRequestPartitionRelease : public UsbMondHeader
   char		mountpoint[DEV_PROPS_MAX_LEN];
 };
 
+const char* msgtostr( eUsbMessages eMsg ); 
 eUsbAction strtoaction( const char* );
 
 #endif //__USBMOND_PROTO_H__
