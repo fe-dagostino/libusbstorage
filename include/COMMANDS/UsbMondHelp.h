@@ -58,9 +58,10 @@ public:
 
   RciResponse        Execute( FChannel& rChannel, const FArguments& rArgs, FArguments& rResults ) const
   {
-    RciResponse _retVal   = rciOk;                        //Default value
+    (void)rChannel;
 
-    FString    _sMethod  = rArgs[0].Trim();
+    RciResponse _retVal   = rciOk;                        //Default value
+    FString     _sMethod  = rArgs[0].Trim();
   
     //Convert method name to upper case.
     _sMethod.UpCase();
