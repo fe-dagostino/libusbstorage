@@ -46,11 +46,11 @@ UsbStorageMonitor::~UsbStorageMonitor()
     }
 }
 
-bool 	UsbStorageMonitor::Start( 
-				  const FString&           sDestAddress,
-				  WORD                     wDestPort,
-				  UsbStorageMonitorEvents* pEvents 
-				)
+bool UsbStorageMonitor::Start(
+                                    const FString&           sDestAddress,
+                                    WORD                     wDestPort,
+                                    UsbStorageMonitorEvents* pEvents
+                                )
 {
   FMutexCtrl _mtxCtrl( m_mtxMonitor );
   
@@ -70,7 +70,7 @@ bool 	UsbStorageMonitor::Start(
   return true;
 }
 
-bool 	UsbStorageMonitor::Stop()
+bool UsbStorageMonitor::Stop()
 {
   FMutexCtrl _mtxCtrl( m_mtxMonitor );
   
@@ -78,7 +78,7 @@ bool 	UsbStorageMonitor::Stop()
   return true;
 }
 
-bool 	UsbStorageMonitor::RequestPartitionRelease( const FString& sMountPoint )
+bool UsbStorageMonitor::RequestPartitionRelease( const FString& sMountPoint )
 {
   FMutexCtrl _mtxCtrl( m_mtxMonitor );
   
@@ -95,7 +95,7 @@ bool 	UsbStorageMonitor::RequestPartitionRelease( const FString& sMountPoint )
   return true;
 }
 
-VOID	UsbStorageMonitor::Run()
+VOID UsbStorageMonitor::Run()
 {
   
   while ( !m_bExit )
@@ -125,7 +125,7 @@ VOID	UsbStorageMonitor::Run()
     if (!m_pSocket) 
     {
       if ( m_bRaiseEvents )
-	m_pUsbStorageMonitorEvents->OnErrorOccurs();  
+        m_pUsbStorageMonitorEvents->OnErrorOccurs();
       
       // Favorite context switch
       FThread::YieldThread();
