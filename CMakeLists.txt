@@ -2,8 +2,9 @@ cmake_minimum_required (VERSION 2.6)
 PROJECT(libusbstorage)
 
 include_directories( ./include/ )
-include_directories( ../FEDLibrary/source/include )
-include_directories( ../FEDLibrary/source/template_include )
+include_directories( ${CMAKE_INSTALL_PREFIX}/include/fedlibrary/include )
+include_directories( ${CMAKE_INSTALL_PREFIX}/include/fedlibrary/template_include )
+
 
 IF(NOT CMAKE_BUILD_TYPE )
   SET(CMAKE_BUILD_TYPE Release CACHE STRING
@@ -13,22 +14,23 @@ ENDIF()
 
 IF( CMAKE_BUILD_TYPE STREQUAL "Debug" )
   set(  USBMOND_VERSION
-	-1.0.6-debug
+        -1.1.0-debug
     )
   set(  USBSTORAGE_VERSION
-	-1.0.2-debug
+        -1.1.0-debug
     )
   set(  FEDLIB_VER
-        -3.0.2-debug
+        -3.2.0-debug
      )
 ELSE()
   set(  USBMOND_VERSION
+
     )
   set(  USBSTORAGE_VERSION
-	-1.0.2
+        -1.1.0
     )
   set(  FEDLIB_VER
-        -3.0.2
+        -3.2.0
      )
 ENDIF()
 
