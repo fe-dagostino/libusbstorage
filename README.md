@@ -38,3 +38,7 @@ cmake ../
 make 
 ```
 
+In order to install usbmond please follow instruction in file ./install/linux/README .
+
+
+
